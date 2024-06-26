@@ -1,0 +1,68 @@
+
+with sku_check as (
+### list sku bang product_total thieu 
+select sku as sku_check, '1' as ref,a.product_name from 
+(
+select a.sku,b.sku as sku_check,a.product_name from sc_main.dim_product a
+left join smkt_main.dim_product_total b
+on a.sku = b.sku 
+) a where sku_check is null )
+
+,sku_check_total as (
+### list sku bang product khong co
+select sku as sku_check_total, '1' as ref from 
+(
+select a.sku,b.sku as sku_check from smkt_main.dim_product_total a
+left join sc_main.dim_product b
+on a.sku = b.sku 
+) a where sku_check is null )
+
+
+
+### list sku, `Root-category` <>
+, sku_check_root_cate as (
+select sku as sku_check_root_cate,Root_category,check_root_category ,'1' as ref
+ from 
+(
+select a.sku,a.Root_category,b.sku as sku_check,b.root_category as check_root_category from sc_main.dim_product a
+left join smkt_main.dim_product_total b
+on a.sku = b.sku 
+) a where Root_category <> check_root_category ) 
+
+### list sku, `category` <> 
+, sku_check_category as (
+select sku as sku_check_category,category,check_category ,'1' as ref from 
+(
+select a.sku,a.category,b.sku as sku_check,b.category as check_category from sc_main.dim_product a
+left join smkt_main.dim_product_total b
+on a.sku = b.sku 
+) a where category <> check_category )
+
+### list sku, `team` <> 
+, sku_check_team as (
+select sku as sku_check_team,team,check_team ,'1' as ref from 
+(
+select a.sku,a.team,b.sku as sku_check,b.team as check_team from sc_main.dim_product a
+left join smkt_main.dim_product_total b
+on a.sku = b.sku 
+) a where team <> check_team ) 
+
+
+
+### list sku, `company` <> 
+,sku_check_company as (
+select sku as  sku_check_company,company,check_company ,'1' as ref from 
+(
+select a.sku,a.company,b.sku as sku_check,b.company as check_company from sc_main.dim_product a
+left join smkt_main.dim_product_total b
+on a.sku = b.sku 
+) a where company <> check_company ) 
+
+
+SELECT  sku_check,product_name , sku_check_root_cate,Root_category,check_root_category,sku_check_category,category, check_category,sku_check_team,team,check_team,sku_check_company,company,check_company, sku_check_total
+from sku_check a 
+join sku_check_root_cate b on a.`ref` = b.`ref`
+join sku_check_category c on a.`ref` = c.`ref`
+join sku_check_team d on a.`ref` = d.`ref`
+join sku_check_company e on a.`ref` = e.`ref`
+join sku_check_total g on a.`ref` = g.`ref`
